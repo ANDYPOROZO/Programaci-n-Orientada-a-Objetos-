@@ -1,55 +1,62 @@
 import tkinter as tk
 from tkinter import messagebox
 
-class ToDoApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Lista de Tareas")
+# Función para agregar tarea
+def agregar_tarea():
+    tarea = entry_tarea.get()
+    if tarea != "":
+        lista_tareas.insert(tk.END, tarea)
+        entry_tarea.delete(0, tk.END)  # Limpiar el campo de entrada
+    else:
+        messagebox.showwarning("Advertencia", "Por favor, ingresa una tarea.")
 
-        # Campo de entrada
-        self.task_entry = tk.Entry(root, width=50)
-        self.task_entry.pack(pady=10)
-        self.task_entry.bind("<Return>", lambda event: self.add_task())
-
-        # Lista de tareas
-        self.task_list = tk.Listbox(root, width=50, height=10, selectmode=tk.SINGLE)
-        self.task_list.pack(pady=10)
-
-        # Botones
-        self.add_button = tk.Button(root, text="Añadir Tarea", command=self.add_task)
-        self.add_button.pack()
-
-        self.complete_button = tk.Button(root, text="Marcar como Completada", command=self.complete_task)
-        self.complete_button.pack()
-
-        self.delete_button = tk.Button(root, text="Eliminar Tarea", command=self.delete_task)
-        self.delete_button.pack()
-
-    def add_task(self):
-        task = self.task_entry.get()
-        if task:
-            self.task_list.insert(tk.END, task)
-            self.task_entry.delete(0, tk.END)
+# Función para marcar tarea como completada
+def marcar_completada():
+    try:
+        tarea_seleccionada = lista_tareas.curselection()
+        if tarea_seleccionada:
+            tarea = lista_tareas.get(tarea_seleccionada)
+            lista_tareas.delete(tarea_seleccionada)
+            lista_tareas.insert(tk.END, tarea + " (Completada)")
         else:
-            messagebox.showwarning("Advertencia", "No puedes agregar una tarea vacía.")
+            messagebox.showwarning("Advertencia", "Por favor, selecciona una tarea.")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-    def complete_task(self):
-        try:
-            selected_index = self.task_list.curselection()[0]
-            task = self.task_list.get(selected_index)
-            self.task_list.delete(selected_index)
-            self.task_list.insert(selected_index, f"[✔] {task}")
-        except IndexError:
-            messagebox.showwarning("Advertencia", "Selecciona una tarea para completar.")
+# Función para eliminar tarea
+def eliminar_tarea():
+    try:
+        tarea_seleccionada = lista_tareas.curselection()
+        if tarea_seleccionada:
+            lista_tareas.delete(tarea_seleccionada)
+        else:
+            messagebox.showwarning("Advertencia", "Por favor, selecciona una tarea.")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-    def delete_task(self):
-        try:
-            selected_index = self.task_list.curselection()[0]
-            self.task_list.delete(selected_index)
-        except IndexError:
-            messagebox.showwarning("Advertencia", "Selecciona una tarea para eliminar.")
+# Crear la ventana principal
+root = tk.Tk()
+root.title("Lista de Tareas")
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = ToDoApp(root)
-    root.mainloop()
+# Crear campo de entrada para nueva tarea
+entry_tarea = tk.Entry(root, width=30)
+entry_tarea.pack(pady=10)
+
+# Botón para agregar tarea
+boton_agregar = tk.Button(root, text="Añadir Tarea", width=20, command=agregar_tarea)
+boton_agregar.pack(pady=5)
+
+# Crear la lista para mostrar las tareas
+lista_tareas = tk.Listbox(root, height=10, width=50)
+lista_tareas.pack(pady=10)
+
+# Botón para marcar tarea como completada
+boton_completada = tk.Button(root, text="Marcar como Completada", width=20, command=marcar_completada)
+boton_completada.pack(pady=5)
+
+# Botón para eliminar tarea
+boton_eliminar = tk.Button(root, text="Eliminar Tarea", width=20, command=eliminar_tarea)
+boton_eliminar.pack(pady=5)
+
+# Ejecutar la aplicación
+root.mainloop()
